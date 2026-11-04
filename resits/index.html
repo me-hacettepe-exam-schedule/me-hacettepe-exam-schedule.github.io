@@ -246,6 +246,30 @@ html[lang="tr"] { --gecti: " geçti"; }
 .hata { border-color: var(--kalem); }
 .hata pre { white-space: pre-wrap; font: .8125rem/1.4 var(--f-mono); color: var(--ikincil); margin: 0; }
 
+/* ---------- Değişiklik uyarısı (kırmızı kalem düzeltmesi) ---------- */
+.degisim {
+  margin: 14px 0 0; padding: 12px 14px 12px 12px;
+  border: 1.5px solid var(--kalem); border-left-width: 5px; border-radius: 3px 6px 6px 3px;
+  background: var(--kalem-zemin);
+}
+.degisim-ust { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.degisim h2 { margin: 0; font: 700 1.3125rem/1.1 var(--f-baslik); font-stretch: 74%; color: var(--kalem); }
+.degisim-alt { margin: 4px 0 0; font-size: .875rem; color: var(--ikincil); }
+.degisim ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; font-size: .9375rem; }
+.degisim li { line-height: 1.4; }
+.degisim li .kod { font-weight: 600; }
+.degisim-zaman { display: block; font-size: .8125rem; color: var(--ikincil); }
+.degisim-not { margin: 10px 0 0; font-size: .875rem; color: var(--ikincil); }
+.degisim .metin-dugme { color: var(--kalem); }
+.degisim-isaret {
+  display: inline-block; margin-left: 6px; padding: 1px 5px 2px; border: 1.5px solid var(--kalem); border-radius: 2px;
+  color: var(--kalem); font: 600 .6875rem/1.2 var(--f-govde); vertical-align: 1px; white-space: nowrap;
+}
+.sinav.degismis { box-shadow: inset 4px 0 0 var(--kalem); }
+.tc.degismis { position: relative; }
+.tc.degismis::after { content: ""; position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; border-radius: 50%; background: var(--kalem); }
+.eski-deger { color: var(--ikincil); text-decoration: line-through; }
+
 /* ---------- Biçim seçici ve tablo görünümü ---------- */
 .bicim { display: inline-grid; grid-template-columns: 1fr 1fr; border: 1.5px solid var(--cizgi); border-radius: 6px; overflow: hidden; background: var(--yaprak); }
 .bicim button { border: 0; background: transparent; padding: 6px 12px; min-height: 40px; cursor: pointer; font-size: .875rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
@@ -490,6 +514,8 @@ body.kilit { overflow: hidden; }
 
   <div class="paylasim-bari" id="paylasimBari" hidden></div>
 
+  <section class="degisim" id="degisim" aria-live="polite" hidden></section>
+
   <section class="siradaki" id="siradaki" aria-live="polite"></section>
 
   <div class="duzen">
@@ -679,6 +705,15 @@ window.ogrBaslat = function () {
       tabloCaption: function (b) { return b + ': exams by week and day'; }, tabloHafta: 'Week',
       kaydirNot: ' Swipe the table sideways to see the weekend columns.',
       tabloNot: 'Select an exam to view details and calendar options.', tabloNotVurgu: ' Highlighted codes indicate selected courses.',
+      degisimBaslik: 'Schedule updated', degisimAlt: 'The following exams have changed in the last 14 days.',
+      tipDegisti: 'Changed', tipEklendi: 'New', tipKaldirildi: 'Removed',
+      alanTarih: 'date', alanSaat: 'time', alanDerslik: 'room',
+      eklendiMetin: 'added to the schedule', kaldirildiMetin: 'removed from the schedule', oncekiKisa: 'previously',
+      guncelleme: function (z) { return 'Updated ' + z; },
+      digerDegisim: function (n) { return n + (n === 1 ? ' exam' : ' exams') + ' outside your selection also changed. Switch to “All exams” to see ' + (n === 1 ? 'it.' : 'them.'); },
+      degisimKapat: 'Dismiss', dOnceki: 'Previously',
+      kisaTarih: function (p, ayK, gunK) { return gunK + ', ' + p.g + ' ' + ayK; },
+      zamanYaz: function (p, ayK, saat) { return p.g + ' ' + ayK + ', ' + saat; },
       dTur: 'Type', dTarih: 'Date', dSaat: 'Time', dDerslik: 'Room',
       gtEkle: 'Add to Google Calendar', secimdenCikar: 'Remove from selection', secimeEkle: 'Add to selection',
       grup: { s1: '1st year', s2: '2nd year', s3: '3rd year', s4: '4th year and electives', servis: 'Service courses', lisansustu: 'Graduate courses', diger: 'Other' },
@@ -758,6 +793,15 @@ window.ogrBaslat = function () {
       tabloCaption: function (b) { return b + ': haftalara ve günlere göre sınavlar'; }, tabloHafta: 'Hafta',
       kaydirNot: ' Hafta sonu sütunlarını görmek için tabloyu yana kaydırınız.',
       tabloNot: 'Ayrıntılar ve takvime ekleme seçenekleri için bir sınav seçiniz.', tabloNotVurgu: ' Vurgulu kodlar seçili dersleri gösterir.',
+      degisimBaslik: 'Programda değişiklik var', degisimAlt: 'Son 14 günde aşağıdaki sınavlarda değişiklik yapıldı.',
+      tipDegisti: 'Değişti', tipEklendi: 'Yeni', tipKaldirildi: 'Kaldırıldı',
+      alanTarih: 'tarih', alanSaat: 'saat', alanDerslik: 'derslik',
+      eklendiMetin: 'programa eklendi', kaldirildiMetin: 'programdan kaldırıldı', oncekiKisa: 'önceki',
+      guncelleme: function (z) { return 'Güncelleme: ' + z; },
+      digerDegisim: function (n) { return 'Seçili dersler dışında ' + n + ' sınavda daha değişiklik var; görmek için “Tüm sınavlar” görünümüne geçiniz.'; },
+      degisimKapat: 'Kapat', dOnceki: 'Önceki',
+      kisaTarih: function (p, ayK, gunK) { return p.g + ' ' + ayK + ' ' + gunK; },
+      zamanYaz: function (p, ayK, saat) { return p.g + ' ' + ayK + ' ' + saat; },
       dTur: 'Tür', dTarih: 'Tarih', dSaat: 'Saat', dDerslik: 'Derslik',
       gtEkle: 'Google Takvim\'e ekle', secimdenCikar: 'Seçimden çıkar', secimeEkle: 'Seçime ekle',
       grup: { s1: '1. sınıf', s2: '2. sınıf', s3: '3. sınıf', s4: '4. sınıf ve seçmeli', servis: 'Servis dersleri', lisansustu: 'Lisansüstü', diger: 'Diğer' },
@@ -781,6 +825,7 @@ window.ogrBaslat = function () {
   var SITE_URL = /^https?:\/\//.test(V.siteUrl || '') ? V.siteUrl : '';
   var BOLUM_URL = /^https?:\/\//.test(V.bolumUrl || '') ? V.bolumUrl : '';
   var VARSAYILAN_SURE = 120;
+  var DEGISIM_GUN = 14, LS_KAPALI = 'ogr_kapali_degisiklik';
 
   var IKON_TAKVIM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="1.5"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>';
   var IKON_AY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/></svg>';
@@ -832,6 +877,28 @@ window.ogrBaslat = function () {
     var n = trSimdi();
     return bitisDk(s) <= n.getUTCHours() * 60 + n.getUTCMinutes();
   }
+  function kisaTarih(t) { var p = tarihParca(t); return T().kisaTarih(p, T().aylarK[p.a], T().gunlerK[p.hg]); }
+  function zamanYaz(z) { var p = tarihParca(z.slice(0, 10)); return T().zamanYaz(p, T().aylarK[p.a], saatYaz(z.slice(11, 13) + '.' + z.slice(14, 16))); }
+  function degerYaz(x) {
+    var l = [esc(kisaTarih(x.tarih))];
+    if (x.bas) l.push('<span class="mono">' + esc(saatAraligi(x)) + '</span>');
+    if (x.derslik && x.derslik.length) l.push(odalar(x.derslik));
+    return l.join(', ');
+  }
+  function degisimMetni(d) {
+    var t = T();
+    if (d.tip === 'eklendi') return esc(t.eklendiMetin) + ': ' + degerYaz(d.yeni);
+    if (d.tip === 'kaldirildi') return esc(t.kaldirildiMetin) + ' (' + esc(t.oncekiKisa) + ': ' + degerYaz(d.eski) + ')';
+    var l = [], a = d.eski, b = d.yeni;
+    if (a.tarih !== b.tarih) l.push(esc(t.alanTarih) + ' ' + esc(kisaTarih(a.tarih)) + ' → ' + esc(kisaTarih(b.tarih)));
+    if (a.bas !== b.bas || a.bit !== b.bit) l.push(esc(t.alanSaat) + ' <span class="mono">' + esc(a.bas ? saatAraligi(a) : '–') + '</span> → <span class="mono">' + esc(b.bas ? saatAraligi(b) : '–') + '</span>');
+    if ((a.derslik || []).slice().sort().join() !== (b.derslik || []).slice().sort().join()) l.push(esc(t.alanDerslik) + ' ' + (a.derslik.length ? odalar(a.derslik) : '–') + ' → ' + (b.derslik.length ? odalar(b.derslik) : '–'));
+    return l.join('; ');
+  }
+  function isaret(d) {
+    if (!d) return '';
+    return ' <span class="degisim-isaret">' + esc(d.tip === 'eklendi' ? T().tipEklendi : T().tipDegisti) + '</span>';
+  }
   function odalar(l) { return l.map(function (d) { return '<span class="mono">' + esc(d) + '</span>'; }).join(', '); }
   function saatAraligi(s) { return saatYaz(s.bas) + (s.bit ? '–' + saatYaz(s.bit) : ''); }
 
@@ -846,6 +913,36 @@ window.ogrBaslat = function () {
   var dersHarita = {};
   dersler.forEach(function (d) { dersHarita[d.id] = d; });
   var PROGRAM_YOK = !V.hata && !sinavlar.length;
+
+  /* ---------- Değişiklikler: son 14 gün, art arda değişiklikler tek kayıtta birleşir ---------- */
+  function imzaS(x) { return x ? [x.tarih, x.bas, x.bit, (x.derslik || []).slice().sort().join(',')].join('|') : ''; }
+  var degisimler = (function () {
+    var sinir = new Date(Date.now() + 3 * 36e5 - DEGISIM_GUN * 864e5).toISOString().slice(0, 16);
+    var liste = (V.degisiklikler || []).filter(function (d) { return (!MOD || d.tur === MOD) && d.zaman >= sinir; })
+      .sort(function (a, b) { return a.zaman.localeCompare(b.zaman); });
+    var sonuc = [];
+    liste.forEach(function (d) {
+      var onceki = null;
+      if (d.eski) for (var i = sonuc.length - 1; i >= 0; i--) {
+        var m = sonuc[i];
+        if (m.tur === d.tur && m.id === d.id && m.yeni && imzaS(m.yeni) === imzaS(d.eski)) { onceki = m; break; }
+      }
+      if (!onceki) { sonuc.push(JSON.parse(JSON.stringify(d))); return; }
+      onceki.zaman = d.zaman; onceki.yeni = d.yeni;
+      if (d.tip === 'kaldirildi') onceki.tip = onceki.tip === 'eklendi' ? 'yok' : 'kaldirildi';
+      if (onceki.tip === 'degisti' && imzaS(onceki.eski) === imzaS(onceki.yeni)) onceki.tip = 'yok';
+    });
+    return sonuc.filter(function (d) { return d.tip !== 'yok'; }).reverse();
+  })();
+  var sinavDegisim = {};
+  degisimler.forEach(function (d) {
+    if (d.yeni) { var k = d.tur + '|' + d.id + '|' + d.yeni.tarih + '|' + d.yeni.bas; if (!sinavDegisim[k]) sinavDegisim[k] = d; }
+  });
+  function degisimIcin(s) { return sinavDegisim[s.tur + '|' + s.id + '|' + s.tarih + '|' + s.bas] || null; }
+  function degAnahtar(d) { return [d.zaman, d.tip, d.tur, d.id, imzaS(d.eski), imzaS(d.yeni)].join('#'); }
+  function kapaliKume() {
+    try { return new Set(JSON.parse(lsAl(LS_KAPALI) || '[]')); } catch (e) { return new Set(); }
+  }
   function dersAdi(id) { return (dersHarita[id] && dersHarita[id].ad) || ''; }
 
   function idListesi(metin) {
@@ -1057,6 +1154,25 @@ window.ogrBaslat = function () {
       '<button type="button" class="dugme" data-eylem="kendi-secimim">' + esc(T().kayitliyaDon) + '</button>';
   }
 
+  function cizDegisim() {
+    var k = $('degisim'), t = T();
+    if (V.hata || !degisimler.length) { k.hidden = true; k.innerHTML = ''; return; }
+    var sec = aktifSecim(), tum = durum.gorunum === 'tum';
+    var kapali = kapaliKume();
+    var gorunen = degisimler.filter(function (d) { return (tum || sec.has(d.id)) && !kapali.has(degAnahtar(d)); });
+    if (!gorunen.length) { k.hidden = true; k.innerHTML = ''; return; }
+    var diger = tum ? 0 : degisimler.filter(function (d) { return !sec.has(d.id); }).length;
+    k.hidden = false;
+    k.innerHTML = '<div class="degisim-ust"><h2>' + esc(t.degisimBaslik) + '</h2>' +
+      '<button type="button" class="metin-dugme" data-eylem="degisim-kapat">' + esc(t.degisimKapat) + '</button></div>' +
+      '<p class="degisim-alt">' + esc(t.degisimAlt) + '</p><ul>' +
+      gorunen.map(function (d) {
+        return '<li><span class="mono kod">' + esc(d.kod) + '</span> ' + esc(dersAdi(d.id)) + ' (' + esc(turAdi(d.tur)) + '): ' + degisimMetni(d) +
+          '<span class="degisim-zaman">' + esc(t.guncelleme(zamanYaz(d.zaman))) + '</span></li>';
+      }).join('') + '</ul>' +
+      (diger ? '<p class="degisim-not">' + esc(t.digerDegisim(diger)) + '</p>' : '');
+  }
+
   function cizSiradaki() {
     var k = $('siradaki'), t = T();
     if (V.hata) { k.innerHTML = ''; return; }
@@ -1084,7 +1200,7 @@ window.ogrBaslat = function () {
     k.innerHTML =
       '<h2 class="sir-baslik"><span class="on">' + esc(t.siradaki[MOD]) + '</span><mark class="fosfor">' + esc(zaman) + '</mark></h2>' +
       '<p class="sir-ne"><span class="mono kod">' + esc(s.kod) + '</span> ' + esc(dersAdi(s.id)) +
-      ' <span class="etiket t-' + c + '">' + esc(turAdi(s.tur)) + '</span></p>' +
+      ' <span class="etiket t-' + c + '">' + esc(turAdi(s.tur)) + '</span>' + isaret(degisimIcin(s)) + '</p>' +
       '<p class="sir-ayrinti">' + parcalar.join(', ') + '</p>';
   }
 
@@ -1204,8 +1320,10 @@ window.ogrBaslat = function () {
           l.map(function (x) {
             var c = TUR_SINIF[x.tur] || 'diger';
             var benim = tum && sec.has(x.id);
-            return '<button type="button" class="tc t-' + c + (benim ? ' benim' : '') + '" data-sinav="' + x._i + '" aria-label="' +
-              esc(x.kod + ' ' + dersAdi(x.id) + ', ' + turAdi(x.tur) + ', ' + tarihUzun(x.tarih) + (x.bas ? ', ' + saatYaz(x.bas) : '')) + '">' +
+            var dg = degisimIcin(x);
+            return '<button type="button" class="tc t-' + c + (benim ? ' benim' : '') + (dg ? ' degismis' : '') + '" data-sinav="' + x._i + '" aria-label="' +
+              esc(x.kod + ' ' + dersAdi(x.id) + ', ' + turAdi(x.tur) + ', ' + tarihUzun(x.tarih) + (x.bas ? ', ' + saatYaz(x.bas) : '') +
+                (dg ? ', ' + (dg.tip === 'eklendi' ? t.tipEklendi : t.tipDegisti) : '')) + '">' +
               '<span class="tc-saat">' + esc(x.bas ? saatYaz(x.bas) : '–') + '</span>' +
               '<span class="tc-kod"><span>' + esc(x.kod).replace(/\//g, '/<wbr>') + '</span></span>' +
               (x.derslik.length ? '<span class="tc-yer">' + esc(x.derslik.join(' ')) + '</span>' : '') + '</button>';
@@ -1249,7 +1367,10 @@ window.ogrBaslat = function () {
       [t.dSaat, s.bas ? '<span class="mono">' + esc(saatAraligi(s)) + '</span>' + (s.bit ? '' : ' ' + bilinmez(t.bitisYok)) : bilinmez(t.saatYok)],
       [t.dDerslik, s.derslik.length ? odalar(s.derslik) : bilinmez(t.derslikYok)]
     ];
-    $('detayBaslik').innerHTML = '<span class="mono">' + esc(s.kod) + '</span> ' + esc(dersAdi(s.id));
+    var dg = degisimIcin(s);
+    if (dg && dg.eski) satirlar.push([t.dOnceki, '<span class="eski-deger">' + degerYaz(dg.eski) + '</span><span class="degisim-zaman">' + esc(t.guncelleme(zamanYaz(dg.zaman))) + '</span>']);
+    else if (dg) satirlar.push([t.dOnceki, '<span class="degisim-isaret" style="margin:0">' + esc(t.tipEklendi) + '</span> <span class="degisim-zaman">' + esc(t.guncelleme(zamanYaz(dg.zaman))) + '</span>']);
+    $('detayBaslik').innerHTML = '<span class="mono">' + esc(s.kod) + '</span> ' + esc(dersAdi(s.id)) + isaret(dg);
     $('detayGovde').innerHTML = '<dl class="detay-satirlar">' + satirlar.map(function (x) { return '<dt>' + esc(x[0]) + '</dt><dd>' + x[1] + '</dd>'; }).join('') + '</dl>' +
       '<div class="pencere-dugmeler">' +
       (gecmisMi(s) ? '' : '<a class="dugme dolu" href="' + esc(googleLinki(s)) + '" target="_blank" rel="noopener">' + IKON_TAKVIM + esc(t.gtEkle) + '</a>') +
@@ -1271,10 +1392,11 @@ window.ogrBaslat = function () {
       : '<span class="belirsiz">' + esc(t.derslikYok) + '</span>';
     var eylem = gecmis ? '' : '<a class="gtakvim" href="' + esc(googleLinki(s)) + '" target="_blank" rel="noopener" aria-label="' +
       esc(t.gtakvimAria(s.kod, turAdi(s.tur))) + '">' + IKON_TAKVIM + esc(t.gtakvim) + '</a>';
-    return '<li class="sinav t-' + c + (vurgula ? ' benim' : '') + (gecmis ? ' gecmis' : '') + '"' +
+    var dg = degisimIcin(s);
+    return '<li class="sinav t-' + c + (vurgula ? ' benim' : '') + (gecmis ? ' gecmis' : '') + (dg ? ' degismis' : '') + '"' +
       (s.bas && !s.bit ? ' title="' + esc(t.bitisYok) + '"' : '') + '>' +
       '<div class="s-saat mono">' + saat + '</div>' +
-      '<div class="s-ders"><span class="s-kod mono">' + kod + '</span><span class="s-ad">' + esc(dersAdi(s.id)) + '</span></div>' +
+      '<div class="s-ders"><span class="s-kod mono">' + kod + '</span><span class="s-ad">' + esc(dersAdi(s.id)) + '</span>' + isaret(dg) + '</div>' +
       '<div class="s-yer mono">' + yer + '</div>' +
       '<div class="s-tur"><span class="etiket t-' + c + '">' + esc(turAdi(s.tur)) + '</span></div>' +
       '<div class="s-eylem">' + eylem + '</div></li>';
@@ -1421,7 +1543,7 @@ window.ogrBaslat = function () {
   }
 
   function cizHepsi() {
-    cizAntet(); cizPaylasimBari(); cizSiradaki(); cizArac(); cizListe();
+    cizAntet(); cizPaylasimBari(); cizDegisim(); cizSiradaki(); cizArac(); cizListe();
   }
 
   /* ---------- Olaylar ---------- */
@@ -1436,7 +1558,7 @@ window.ogrBaslat = function () {
     }
     if (t.hasAttribute('data-bicim')) { durum.bicim = t.getAttribute('data-bicim'); lsYaz(LS_BICIM, durum.bicim); cizArac(); cizListe(); olc(); return; }
     if (t.hasAttribute('data-sinav')) { detayAc(+t.getAttribute('data-sinav')); return; }
-    if (t.hasAttribute('data-gorunum')) { durum.gorunum = t.getAttribute('data-gorunum'); cizArac(); cizListe(); olc(); return; }
+    if (t.hasAttribute('data-gorunum')) { durum.gorunum = t.getAttribute('data-gorunum'); cizDegisim(); cizArac(); cizListe(); olc(); return; }
     if (t.hasAttribute('data-tur')) { var tr = t.getAttribute('data-tur'); durum.turler[tr] = !durum.turler[tr]; cizArac(); cizListe(); return; }
     if (t.hasAttribute('data-grup-hepsi')) {
       var kutular = t.closest('.grup').querySelectorAll('li:not([hidden]) input[type=checkbox]');
@@ -1464,6 +1586,13 @@ window.ogrBaslat = function () {
         var ids = idListesi(lsAl(LS_DONEM));
         secimiDegistir(function (s) { ids.forEach(function (id) { s.add(id); }); });
         seciciAc();
+        break;
+      case 'degisim-kapat':
+        var kume = kapaliKume(), gecerli = {};
+        degisimler.forEach(function (d) { gecerli[degAnahtar(d)] = 1; });
+        degisimler.forEach(function (d) { if (durum.gorunum === 'tum' || aktifSecim().has(d.id)) kume.add(degAnahtar(d)); });
+        lsYaz(LS_KAPALI, JSON.stringify(Array.from(kume).filter(function (a) { return gecerli[a]; })));
+        cizDegisim();
         break;
       case 'kendi-secimim': durum.paylasilan = null; urlTemizle(); guncelleSecici(); cizHepsi(); break;
     }
