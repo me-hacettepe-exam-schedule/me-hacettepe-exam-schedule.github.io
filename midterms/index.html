@@ -270,6 +270,20 @@ html[lang="tr"] { --gecti: " geçti"; }
 .tc.degismis::after { content: ""; position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; border-radius: 50%; background: var(--kalem); }
 .eski-deger { color: var(--ikincil); text-decoration: line-through; }
 
+/* ---------- Personel sitesi ---------- */
+.personel #secici, .personel .gorunum, .personel .derslerim, .personel #paylasDugme { display: none !important; }
+.personel .duzen { display: block; }
+.gozetmen-sec { display: inline-flex; align-items: center; gap: 8px; font-size: .9375rem; flex: 1 1 100%; }
+.gozetmen-sec span { color: var(--ikincil); white-space: nowrap; }
+.gozetmen-sec select {
+  flex: 1 1 auto; min-width: 0; min-height: 44px; padding: 8px 10px; border: 1.5px solid var(--murekkep); border-radius: 6px;
+  background: var(--yaprak); color: var(--murekkep); font: 500 .9375rem var(--f-govde);
+}
+.s-gozetmen { display: block; margin-top: 2px; font-size: .8125rem; color: var(--ikincil); }
+.s-gozetmen b { color: var(--murekkep); font-weight: 600; background: var(--fosfor); border-radius: 2px; padding: 0 2px; }
+.personel-not { margin: 12px 0 0; font-size: .875rem; color: var(--ikincil); }
+@media (min-width: 640px) { .gozetmen-sec { flex: 0 1 auto; } .gozetmen-sec select { min-width: 16rem; } }
+
 /* ---------- Biçim seçici ve tablo görünümü ---------- */
 .bicim { display: inline-grid; grid-template-columns: 1fr 1fr; border: 1.5px solid var(--cizgi); border-radius: 6px; overflow: hidden; background: var(--yaprak); }
 .bicim button { border: 0; background: transparent; padding: 6px 12px; min-height: 40px; cursor: pointer; font-size: .875rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
@@ -705,6 +719,12 @@ window.ogrBaslat = function () {
       tabloCaption: function (b) { return b + ': exams by week and day'; }, tabloHafta: 'Week',
       kaydirNot: ' Swipe the table sideways to see the weekend columns.',
       tabloNot: 'Select an exam to view details and calendar options.', tabloNotVurgu: ' Highlighted codes indicate selected courses.',
+      pBaslik: 'Invigilation Schedule', pAlt: 'Department of Mechanical Engineering, staff only',
+      pGozetmen: 'Invigilator', pHepsi: 'All invigilators', pSiradaki: 'Next invigilation duty', pSiradakiHepsi: 'Next exam',
+      pGozetmenler: 'Invigilators', pGozetmenYok: 'No invigilator assigned', pYayinlanmadi: 'Not yet published to students: ',
+      pAnahtarYok: 'This page needs the staff link', pAnahtarYokMetin: 'Open the page with the link shared with department staff.',
+      pAnahtarHatali: 'The staff link is not valid', pAnahtarHataliMetin: 'The link may have been renewed. Please ask for the current staff link.',
+      pDosya: 'invigilation-schedule', pGorevYok: 'No duties to display', pGorevYokMetin: 'The selected invigilator has no duties in the chosen exam types.',
       degisimBaslik: 'Schedule updated', degisimAlt: 'The following exams have changed in the last 14 days.',
       tipDegisti: 'Changed', tipEklendi: 'New', tipKaldirildi: 'Removed',
       alanTarih: 'date', alanSaat: 'time', alanDerslik: 'room',
@@ -793,6 +813,12 @@ window.ogrBaslat = function () {
       tabloCaption: function (b) { return b + ': haftalara ve günlere göre sınavlar'; }, tabloHafta: 'Hafta',
       kaydirNot: ' Hafta sonu sütunlarını görmek için tabloyu yana kaydırınız.',
       tabloNot: 'Ayrıntılar ve takvime ekleme seçenekleri için bir sınav seçiniz.', tabloNotVurgu: ' Vurgulu kodlar seçili dersleri gösterir.',
+      pBaslik: 'Gözetmen Programı', pAlt: 'Makine Mühendisliği Bölümü, yalnızca personel için',
+      pGozetmen: 'Gözetmen', pHepsi: 'Tüm gözetmenler', pSiradaki: 'Sıradaki gözetmenlik görevi', pSiradakiHepsi: 'Sıradaki sınav',
+      pGozetmenler: 'Gözetmenler', pGozetmenYok: 'Gözetmen atanmamış', pYayinlanmadi: 'Öğrencilere henüz yayımlanmayanlar: ',
+      pAnahtarYok: 'Bu sayfa için personel bağlantısı gerekir', pAnahtarYokMetin: 'Sayfayı bölüm personeliyle paylaşılan bağlantıdan açınız.',
+      pAnahtarHatali: 'Personel bağlantısı geçerli değil', pAnahtarHataliMetin: 'Bağlantı yenilenmiş olabilir. Lütfen güncel personel bağlantısını isteyiniz.',
+      pDosya: 'gozetmen-programi', pGorevYok: 'Gösterilecek görev bulunmamaktadır', pGorevYokMetin: 'Seçilen gözetmenin seçilen türlerde görevi bulunmamaktadır.',
       degisimBaslik: 'Programda değişiklik var', degisimAlt: 'Son 14 günde aşağıdaki sınavlarda değişiklik yapıldı.',
       tipDegisti: 'Değişti', tipEklendi: 'Yeni', tipKaldirildi: 'Kaldırıldı',
       alanTarih: 'tarih', alanSaat: 'saat', alanDerslik: 'derslik',
@@ -818,7 +844,9 @@ window.ogrBaslat = function () {
 
   var GRUP_SIRA = ['s1', 's2', 's3', 's4', 'servis', 'lisansustu', 'diger'];
   var TUR_SINIF = { 'Vize': 'vize', 'Final': 'final', 'Bütünleme': 'but' };
-  var MOD = ({ 'Vize': 1, 'Final': 1, 'Bütünleme': 1 })[V.mod] ? V.mod : '';
+  var PERSONEL = V.personel === true;
+  var MOD = !PERSONEL && ({ 'Vize': 1, 'Final': 1, 'Bütünleme': 1 })[V.mod] ? V.mod : '';
+  var LS_GOZETMEN = 'ogr_p_gozetmen';
   var MOD_KISA = { '': '', 'Vize': 'vize', 'Final': 'final', 'Bütünleme': 'but' }[MOD];
   var LS_DONEM = 'ogr_secim', LS_BICIM = 'ogr_bicim', LS_DIL = 'ogr_dil', LS_TEMA = 'ogr_tema';
   var LS_SECIM = MOD === 'Bütünleme' ? 'ogr_secim_but' : LS_DONEM;
@@ -850,7 +878,7 @@ window.ogrBaslat = function () {
   function T() { return M[DIL]; }
   function turAdi(t) { return T().tur[t] || t; }
   function saatYaz(h) { return DIL === 'en' ? String(h).replace('.', ':') : h; }
-  function baslik() { return T().baslik[MOD]; }
+  function baslik() { return PERSONEL ? T().pBaslik : T().baslik[MOD]; }
 
   function kodId(s) {
     var h = { 'Ü': 'U', 'ü': 'U', 'Ö': 'O', 'ö': 'O', 'Ç': 'C', 'ç': 'C', 'Ş': 'S', 'ş': 'S', 'Ğ': 'G', 'ğ': 'G', 'İ': 'I', 'ı': 'I' };
@@ -990,13 +1018,20 @@ window.ogrBaslat = function () {
     else if (ayni) urlTemizle();
     else durum.paylasilan = new Set(urlIds);
   })();
+  // Seçim yoksa (ilk ziyaret) sayfa boş açılmasın: tüm sınavlar gösterilir.
+  if (PERSONEL || (!durum.secim.size && !durum.paylasilan)) durum.gorunum = 'tum';
+  durum.gozetmen = PERSONEL ? (lsAl(LS_GOZETMEN) || '') : '';
 
   /* ---------- Hesaplar ---------- */
-  function benimSinavlar() { var s = aktifSecim(); return sinavlar.filter(function (x) { return s.has(x.id); }); }
+  function gozetmenUyar(x) { return !durum.gozetmen || (x.gozetmen || []).indexOf(durum.gozetmen) !== -1; }
+  function benimSinavlar() {
+    if (PERSONEL) return sinavlar.filter(gozetmenUyar);
+    var s = aktifSecim(); return sinavlar.filter(function (x) { return s.has(x.id); });
+  }
   function gorunenSinavlar(gecmisDahil) {
     var s = aktifSecim();
     return sinavlar.filter(function (x) {
-      return (durum.gorunum === 'tum' || s.has(x.id)) && turAcik(x.tur) && (gecmisDahil || durum.gecmis || !gecmisMi(x));
+      return (durum.gorunum === 'tum' || s.has(x.id)) && (!PERSONEL || gozetmenUyar(x)) && turAcik(x.tur) && (gecmisDahil || durum.gecmis || !gecmisMi(x));
     });
   }
   function icsSinavlari() {
@@ -1047,6 +1082,7 @@ window.ogrBaslat = function () {
     else z = { tumGun: false, bas: utcDamga(s.tarih, s.bas, 0), bit: utcDamga(s.tarih, s.bas, sureBelli ? bitDk - basDk : VARSAYILAN_SURE) };
     var notlar = [t.icsNot + t.uyari, '', t.icsSinav(turAdi(s.tur), s.hafta ? haftaEtiketi(s.hafta) : '')];
     if (s.derslik.length) notlar.push(t.icsDerslik + s.derslik.join(', ') + '.');
+    if (PERSONEL && (s.gozetmen || []).length) notlar.push(t.pGozetmenler + ': ' + s.gozetmen.join(', ') + '.');
     if (basDk == null) notlar.push(t.icsSaatYok);
     else if (!sureBelli) notlar.push(t.icsSureYok);
     if (SITE_URL) notlar.push(t.icsGuncel + SITE_URL);
@@ -1103,7 +1139,7 @@ window.ogrBaslat = function () {
   function icsIndir() {
     var liste = icsSinavlari();
     if (!liste.length) return;
-    var ad = T().dosya[MOD] + (V.donem ? '-' + sade(V.donem.replace(/\s+/g, '-')).replace(/[^a-z0-9-]/g, '') : '') + '.ics';
+    var ad = (PERSONEL ? T().pDosya + (durum.gozetmen ? '-' + sade(durum.gozetmen).replace(/[^a-z0-9]/g, '') : '') : T().dosya[MOD]) + (V.donem ? '-' + sade(V.donem.replace(/\s+/g, '-')).replace(/[^a-z0-9-]/g, '') : '') + '.ics';
     var metin = icsUret(liste);
     try {
       var url = URL.createObjectURL(new Blob([metin], { type: 'text/calendar;charset=utf-8' }));
@@ -1129,7 +1165,7 @@ window.ogrBaslat = function () {
     $('yazdirDugme').setAttribute('aria-label', t.yazdirAria);
     $('yazdirDugme').title = t.yazdir;
     $('baslik').textContent = baslik();
-    $('altBaslik').textContent = t.alt;
+    $('altBaslik').textContent = PERSONEL ? t.pAlt : t.alt;
     $('dipnotUyari').innerHTML = esc(t.dipnot2) +
       (BOLUM_URL ? ' <a href="' + esc(BOLUM_URL) + '" target="_blank" rel="noopener">' + esc(t.bolumSitesi) + '</a>' : '');
     cizTemaDugme();
@@ -1180,7 +1216,7 @@ window.ogrBaslat = function () {
       k.innerHTML = '<p class="sir-bos">' + esc(t.program[MOD] + t.yayimlanmadi) + '</p><p>' + esc(t.yayimlanmadiEk) + '</p>';
       return;
     }
-    if (!aktifSecim().size) {
+    if (!PERSONEL && !aktifSecim().size) {
       k.innerHTML = '<p class="sir-bos">' + esc(MOD === 'Bütünleme' ? t.secimYokSirBut : t.secimYokSir) + '</p>' +
         '<p>' + esc(MOD === 'Bütünleme' ? t.secimSaklanirBut : MOD ? t.secimSaklanirMod : t.secimSaklanir) + '</p>';
       return;
@@ -1198,7 +1234,7 @@ window.ogrBaslat = function () {
     if (s.bas) parcalar.push('<span class="mono">' + esc(saatAraligi(s)) + '</span>');
     if (s.derslik.length) parcalar.push(odalar(s.derslik));
     k.innerHTML =
-      '<h2 class="sir-baslik"><span class="on">' + esc(t.siradaki[MOD]) + '</span><mark class="fosfor">' + esc(zaman) + '</mark></h2>' +
+      '<h2 class="sir-baslik"><span class="on">' + esc(PERSONEL ? (durum.gozetmen ? t.pSiradaki : t.pSiradakiHepsi) : t.siradaki[MOD]) + '</span><mark class="fosfor">' + esc(zaman) + '</mark></h2>' +
       '<p class="sir-ne"><span class="mono kod">' + esc(s.kod) + '</span> ' + esc(dersAdi(s.id)) +
       ' <span class="etiket t-' + c + '">' + esc(turAdi(s.tur)) + '</span>' + isaret(degisimIcin(s)) + '</p>' +
       '<p class="sir-ayrinti">' + parcalar.join(', ') + '</p>';
@@ -1230,6 +1266,11 @@ window.ogrBaslat = function () {
     k.classList.remove('hata');
     if (V.hata) {
       k.classList.add('hata');
+      if (V.hata === 'anahtar-yok' || V.hata === 'anahtar-hatali') {
+        var yok = V.hata === 'anahtar-yok';
+        k.innerHTML = '<div class="bos"><h2>' + esc(yok ? t.pAnahtarYok : t.pAnahtarHatali) + '</h2><p>' + esc(yok ? t.pAnahtarYokMetin : t.pAnahtarHataliMetin) + '</p></div>';
+        return;
+      }
       k.innerHTML = '<div class="bos"><h2>' + esc(t.hataBaslik) + '</h2><p>' + esc(t.hataMetin) + '</p><pre>' + esc(V.hata) + '</pre></div>';
       return;
     }
@@ -1250,7 +1291,8 @@ window.ogrBaslat = function () {
     }
     var liste = gorunenSinavlar(false);
     if (!liste.length) {
-      k.innerHTML = gorunenSinavlar(true).length ? bosDurum(t.hepsiGecti, t.hepsiGectiMetin) : bosDurum(t.sinavYok, t.sinavYokMetin);
+      k.innerHTML = gorunenSinavlar(true).length ? bosDurum(t.hepsiGecti, t.hepsiGectiMetin)
+        : PERSONEL && durum.gozetmen ? bosDurum(t.pGorevYok, t.pGorevYokMetin) : bosDurum(t.sinavYok, t.sinavYokMetin);
       return;
     }
     if (durum.bicim === 'tablo') { cizTablo(k, liste, sec); return; }
@@ -1367,6 +1409,7 @@ window.ogrBaslat = function () {
       [t.dSaat, s.bas ? '<span class="mono">' + esc(saatAraligi(s)) + '</span>' + (s.bit ? '' : ' ' + bilinmez(t.bitisYok)) : bilinmez(t.saatYok)],
       [t.dDerslik, s.derslik.length ? odalar(s.derslik) : bilinmez(t.derslikYok)]
     ];
+    if (PERSONEL) satirlar.push([t.pGozetmenler, (s.gozetmen || []).length ? esc(s.gozetmen.join(', ')) : bilinmez(t.pGozetmenYok)]);
     var dg = degisimIcin(s);
     if (dg && dg.eski) satirlar.push([t.dOnceki, '<span class="eski-deger">' + degerYaz(dg.eski) + '</span><span class="degisim-zaman">' + esc(t.guncelleme(zamanYaz(dg.zaman))) + '</span>']);
     else if (dg) satirlar.push([t.dOnceki, '<span class="degisim-isaret" style="margin:0">' + esc(t.tipEklendi) + '</span> <span class="degisim-zaman">' + esc(t.guncelleme(zamanYaz(dg.zaman))) + '</span>']);
@@ -1378,6 +1421,14 @@ window.ogrBaslat = function () {
       '<button type="button" class="dugme" data-eylem="pencere-kapat">' + esc(t.kapat) + '</button></div>' +
       (gecmisMi(s) ? '' : '<p class="durum-satiri">' + esc(t.uyari) + '</p>');
     perdeAc('detayPerde', '[data-eylem="pencere-kapat"]');
+  }
+
+  function gozetmenSatiri(s) {
+    if (!PERSONEL) return '';
+    var g = s.gozetmen || [];
+    return '<span class="s-gozetmen">' + esc(T().pGozetmenler) + ': ' + (g.length ? g.map(function (a) {
+      return a === durum.gozetmen ? '<b>' + esc(a) + '</b>' : esc(a);
+    }).join(', ') : esc(T().pGozetmenYok)) + '</span>';
   }
 
   function satir(s, vurgula) {
@@ -1396,7 +1447,7 @@ window.ogrBaslat = function () {
     return '<li class="sinav t-' + c + (vurgula ? ' benim' : '') + (gecmis ? ' gecmis' : '') + (dg ? ' degismis' : '') + '"' +
       (s.bas && !s.bit ? ' title="' + esc(t.bitisYok) + '"' : '') + '>' +
       '<div class="s-saat mono">' + saat + '</div>' +
-      '<div class="s-ders"><span class="s-kod mono">' + kod + '</span><span class="s-ad">' + esc(dersAdi(s.id)) + '</span>' + isaret(dg) + '</div>' +
+      '<div class="s-ders"><span class="s-kod mono">' + kod + '</span><span class="s-ad">' + esc(dersAdi(s.id)) + '</span>' + isaret(dg) + gozetmenSatiri(s) + '</div>' +
       '<div class="s-yer mono">' + yer + '</div>' +
       '<div class="s-tur"><span class="etiket t-' + c + '">' + esc(turAdi(s.tur)) + '</span></div>' +
       '<div class="s-eylem">' + eylem + '</div></li>';
@@ -1448,7 +1499,10 @@ window.ogrBaslat = function () {
 
   function secimiDegistir(fn) {
     if (durum.paylasilan) { durum.secim = new Set(durum.paylasilan); durum.paylasilan = null; urlTemizle(); }
+    var oncekiBos = !durum.secim.size;
     fn(durum.secim);
+    // İlk ders seçilince "Seçili dersler" görünümüne geçilir.
+    if (oncekiBos && durum.secim.size && durum.gorunum === 'tum') durum.gorunum = 'benim';
     kaydet();
     guncelleSecici();
     cizHepsi();
@@ -1553,7 +1607,7 @@ window.ogrBaslat = function () {
     if (t.hasAttribute('data-dil')) {
       DIL = t.getAttribute('data-dil') === 'tr' ? 'tr' : 'en';
       lsYaz(LS_DIL, DIL);
-      metinleriUygula(); cizSecici(); cizHepsi(); olc();
+      metinleriUygula(); cizSecici(); cizGozetmenSecici(); cizHepsi(); olc();
       return;
     }
     if (t.hasAttribute('data-bicim')) { durum.bicim = t.getAttribute('data-bicim'); lsYaz(LS_BICIM, durum.bicim); cizArac(); cizListe(); olc(); return; }
@@ -1622,13 +1676,46 @@ window.ogrBaslat = function () {
     if (mq.addEventListener) mq.addEventListener('change', cizTemaDugme);
   }
 
+  /* ---------- Personel: gözetmen seçimi ---------- */
+  function cizGozetmenSecici() {
+    if (!PERSONEL) return;
+    var t = T(), sel = $('gozetmenSec');
+    if (!sel) {
+      var l = document.createElement('label');
+      l.className = 'gozetmen-sec';
+      l.innerHTML = '<span id="gozetmenEtiket"></span><select id="gozetmenSec"></select>';
+      $('arac').insertBefore(l, $('arac').firstChild);
+      sel = $('gozetmenSec');
+      sel.addEventListener('change', function () {
+        durum.gozetmen = this.value; lsYaz(LS_GOZETMEN, durum.gozetmen || null);
+        cizSiradaki(); cizArac(); cizListe();
+      });
+    }
+    $('gozetmenEtiket').textContent = t.pGozetmen;
+    var adlar = (V.gozetmenler || []).slice();
+    sinavlar.forEach(function (x) { (x.gozetmen || []).forEach(function (a) { if (adlar.indexOf(a) === -1) adlar.push(a); }); });
+    var say = {};
+    sinavlar.forEach(function (x) { if (!gecmisMi(x)) (x.gozetmen || []).forEach(function (a) { say[a] = (say[a] || 0) + 1; }); });
+    if (durum.gozetmen && adlar.indexOf(durum.gozetmen) === -1) durum.gozetmen = '';
+    sel.innerHTML = '<option value="">' + esc(t.pHepsi) + '</option>' + adlar.map(function (a) {
+      return '<option value="' + esc(a) + '"' + (a === durum.gozetmen ? ' selected' : '') + '>' + esc(a) + ' (' + (say[a] || 0) + ')</option>';
+    }).join('');
+    var kapali = Object.keys(V.yayinda || {}).filter(function (x) { return V.yayinda[x] === false; });
+    var n = $('personelNot');
+    if (!n) { n = document.createElement('p'); n.id = 'personelNot'; n.className = 'personel-not'; $('siradaki').parentNode.insertBefore(n, $('siradaki')); }
+    n.hidden = !kapali.length;
+    n.textContent = kapali.length ? t.pYayinlanmadi + kapali.map(turAdi).join(', ') + '.' : '';
+  }
+
   /* ---------- Başlat ---------- */
+  if (PERSONEL) document.documentElement.classList.add('personel');
   if (MOD) {
     document.documentElement.setAttribute('data-mod', MOD_KISA);
     document.documentElement.classList.add('tek-tur');
   }
   metinleriUygula();
   cizSecici();
+  cizGozetmenSecici();
   cizHepsi();
   olc();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(olc);
