@@ -809,11 +809,12 @@ window.ogrBaslat = function () {
       sinavsizBaslik: 'Selected courses without an exam in the schedule',
       notlar: {
         yok: function (t) { return 'This course has no ' + t.toLowerCase() + ' exam.'; },
-        takehome: function (t) { return 'Take-home ' + t.toLowerCase() + ' exam; details are announced by the course instructor.'; },
+        takehome: function (t) { return 'The ' + t.toLowerCase() + ' exam is a take-home exam.'; },
         proje: function (t) { return 'Assessed by a project or assignment instead of a written ' + t.toLowerCase() + ' exam.'; },
         duyurulacak: function (t) { return 'The ' + t.toLowerCase() + ' exam date will be announced later.'; },
-        bilinmiyor: function (t) { return 'No ' + t.toLowerCase() + ' exam is listed in the schedule for this course. Please follow the course announcements.'; }
+        bilinmiyor: function (t) { return 'No ' + t.toLowerCase() + ' exam is listed in the schedule for this course.'; }
       },
+      notTakip: 'Please follow the announcements of the course instructor.',
       kisaNot: { yok: 'No exam', takehome: 'Take-home', proje: 'Project / assignment', duyurulacak: 'Date to be announced', bilinmiyor: 'Not in the schedule', serbest: 'See note' },
       tumOzet: 'All exams. ', seciliOzet: 'Selected courses: ',
       icsSinav: function (tur, hafta) { return tur + ' exam' + (hafta ? ' (' + hafta + ')' : '') + '.'; },
@@ -912,11 +913,12 @@ window.ogrBaslat = function () {
       sinavsizBaslik: 'Programda sınavı bulunmayan seçili dersler',
       notlar: {
         yok: function (t) { return 'Bu dersin ' + t.toLocaleLowerCase('tr') + ' sınavı yoktur.'; },
-        takehome: function (t) { return t + ' sınavı take-home (evde) yapılır; ayrıntılar dersin öğretim üyesi tarafından duyurulur.'; },
+        takehome: function (t) { return t + ' sınavı take-home (evde) sınav olarak yapılır.'; },
         proje: function (t) { return 'Yazılı ' + t.toLocaleLowerCase('tr') + ' sınavı yerine proje veya ödev ile değerlendirilir.'; },
         duyurulacak: function (t) { return t + ' sınavının tarihi daha sonra duyurulacaktır.'; },
-        bilinmiyor: function (t) { return 'Programda bu dersin ' + t.toLocaleLowerCase('tr') + ' sınavı bulunmamaktadır. Ders duyurularını takip ediniz.'; }
+        bilinmiyor: function (t) { return 'Programda bu dersin ' + t.toLocaleLowerCase('tr') + ' sınavı bulunmamaktadır.'; }
       },
+      notTakip: 'Dersin öğretim üyesinin duyurularını takip ediniz.',
       kisaNot: { yok: 'Sınav yok', takehome: 'Take-home', proje: 'Proje / ödev', duyurulacak: 'Tarih duyurulacak', bilinmiyor: 'Programda yok', serbest: 'Notu var' },
       tumOzet: 'Tüm sınavlar. ', seciliOzet: 'Seçili dersler: ',
       icsSinav: function (tur, hafta) { return tur + ' sınavı' + (hafta ? ' (' + hafta + ')' : '') + '.'; },
@@ -1355,7 +1357,9 @@ window.ogrBaslat = function () {
   function dersNotu(d, t) { return (d.not && d.not[t]) || ''; }
   function notMetni(n, t) {
     var f = T().notlar[n || 'bilinmiyor'];
-    return f ? f(turAdi(t)) : n;   // Listede olmayan not, e-tabloda yazıldığı gibi gösterilir.
+    var m = f ? f(turAdi(t)) : String(n).trim();   // Listede olmayan not, e-tabloda yazıldığı gibi gösterilir.
+    // Her notun sonunda hocanın duyurularını takip etme uyarısı bulunur.
+    return m + (/[.!?…]$/.test(m) ? ' ' : '. ') + T().notTakip;
   }
   function sinavsizDersler() {
     if (PERSONEL || PROGRAM_YOK || V.hata) return [];
