@@ -703,7 +703,12 @@ body.kilit { overflow: hidden; }
       }).then(function (akis) {
         var acik = new Uint8Array(c.length);
         for (var i = 0; i < c.length; i++) acik[i] = c[i] ^ akis[i >> 5][i & 31];
-        bitir(JSON.parse(new TextDecoder().decode(acik)));
+        var veri = JSON.parse(new TextDecoder().decode(acik));
+        // Değişiklik kaydı öğrenci verisinde (herkese açık veri.json) durur; işaretler için oradan alınır.
+        return fetch('../veri.json?v=' + Math.floor(Date.now() / 60000))
+          .then(function (r) { return r.ok ? r.json() : {}; })
+          .catch(function () { return {}; })
+          .then(function (o) { if (o && o.degisiklikler) veri.degisiklikler = o.degisiklikler; bitir(veri); });
       });
     })
     .catch(function (e) {
@@ -1307,7 +1312,8 @@ window.ogrBaslat = function () {
 
   function cizDegisim() {
     var k = $('degisim'), t = T();
-    if (V.hata || !degisimler.length) { k.hidden = true; k.innerHTML = ''; return; }
+    // Personel sayfasında üstteki uyarı kutusu gösterilmez; değişiklikler listede ve tabloda işaretlenir.
+    if (V.hata || PERSONEL || !degisimler.length) { k.hidden = true; k.innerHTML = ''; return; }
     var sec = aktifSecim(), tum = durum.gorunum === 'tum';
     var kapali = kapaliKume();
     var gelecekte = function (d) { var x = d.yeni || d.eski; return !x || x.tarih >= BUGUN; };

@@ -1256,7 +1256,8 @@ window.ogrBaslat = function () {
 
   function cizDegisim() {
     var k = $('degisim'), t = T();
-    if (V.hata || !degisimler.length) { k.hidden = true; k.innerHTML = ''; return; }
+    // Personel sayfasında üstteki uyarı kutusu gösterilmez; değişiklikler listede ve tabloda işaretlenir.
+    if (V.hata || PERSONEL || !degisimler.length) { k.hidden = true; k.innerHTML = ''; return; }
     var sec = aktifSecim(), tum = durum.gorunum === 'tum';
     var kapali = kapaliKume();
     var gelecekte = function (d) { var x = d.yeni || d.eski; return !x || x.tarih >= BUGUN; };
