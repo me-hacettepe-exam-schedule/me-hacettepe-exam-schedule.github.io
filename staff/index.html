@@ -251,6 +251,7 @@ html[lang="tr"] { --gecti: " geçti"; }
 .sinavsiz li { padding: 10px 0; line-height: 1.35; }
 .sinavsiz li + li { border-top: 1px dotted var(--cizgi); }
 .sinavsiz .etiket { margin-left: 6px; vertical-align: 1px; }
+.sinavsiz-dugme { margin: 4px 0 10px; }
 .sinavsiz-not { display: block; margin-top: 3px; color: var(--ikincil); font-size: .9375rem; max-width: 70ch; }
 .secici-not {
   display: inline-block; margin-left: 6px; padding: 1px 5px 2px; border: 1px solid var(--cizgi); border-radius: 2px;
@@ -511,6 +512,7 @@ body.kilit { overflow: hidden; }
   .liste { border: 1px solid #000; box-shadow: none; }
   .gun-tarih { position: static; }
   .gun, .hafta-bas, .sinavsiz li { break-inside: avoid; }
+  .sinavsiz-dugme { display: none; }
   .sinavsiz h2 { break-after: avoid; }
   .hafta-bas { break-after: avoid; }
   .sinav { grid-template-columns: 6.5rem minmax(0, 1fr) 8rem 5.5rem; grid-template-areas: "saat ders yer tur"; padding: 6px 10px; }
@@ -815,7 +817,10 @@ window.ogrBaslat = function () {
         bilinmiyor: function (t) { return 'No ' + t.toLowerCase() + ' exam is listed in the schedule for this course.'; }
       },
       notTakip: 'Please follow the announcements of the course instructor.',
-      kisaNot: { yok: 'No exam', takehome: 'Take-home', proje: 'Project / assignment', duyurulacak: 'Date to be announced', bilinmiyor: 'Not in the schedule', serbest: 'See note' },
+      kisaNot: { yok: 'No exam', takehome: 'Take-home', proje: 'Project / assignment', duyurulacak: 'Date to be announced', bilinmiyor: 'Not in the schedule', serbest: 'See note', gecti: 'Exam passed' },
+      gectiBaslik: 'Selected courses whose exams have passed',
+      gectiMetin: function (t, tarihler, n) { return 'The ' + t.toLowerCase() + (n > 1 ? ' exams took place on ' : ' exam took place on ') + tarihler + '.'; },
+      gectiGoster: 'Show past exams',
       tumOzet: 'All exams. ', seciliOzet: 'Selected courses: ',
       icsSinav: function (tur, hafta) { return tur + ' exam' + (hafta ? ' (' + hafta + ')' : '') + '.'; },
       icsDerslik: 'Room: ', icsSaatYok: 'Time not specified; added as an all-day event.',
@@ -919,7 +924,10 @@ window.ogrBaslat = function () {
         bilinmiyor: function (t) { return 'Programda bu dersin ' + t.toLocaleLowerCase('tr') + ' sınavı bulunmamaktadır.'; }
       },
       notTakip: 'Dersin öğretim üyesinin duyurularını takip ediniz.',
-      kisaNot: { yok: 'Sınav yok', takehome: 'Take-home', proje: 'Proje / ödev', duyurulacak: 'Tarih duyurulacak', bilinmiyor: 'Programda yok', serbest: 'Notu var' },
+      kisaNot: { yok: 'Sınav yok', takehome: 'Take-home', proje: 'Proje / ödev', duyurulacak: 'Tarih duyurulacak', bilinmiyor: 'Programda yok', serbest: 'Notu var', gecti: 'Sınavı yapıldı' },
+      gectiBaslik: 'Sınavı yapılmış seçili dersler',
+      gectiMetin: function (t, tarihler, n) { return t + (n > 1 ? ' sınavları ' + tarihler + ' tarihlerinde yapılmıştır.' : ' sınavı ' + tarihler + ' tarihinde yapılmıştır.'); },
+      gectiGoster: 'Geçmiş sınavları göster',
       tumOzet: 'Tüm sınavlar. ', seciliOzet: 'Seçili dersler: ',
       icsSinav: function (tur, hafta) { return tur + ' sınavı' + (hafta ? ' (' + hafta + ')' : '') + '.'; },
       icsDerslik: 'Derslik: ', icsSaatYok: 'Saat belirtilmemiş; tüm gün etkinliği olarak eklendi.',
@@ -1026,7 +1034,17 @@ window.ogrBaslat = function () {
   var dersler = (V.dersler || []).slice();
   // Hangi derslerin hangi türde sınavı var (sınavsız derslere not göstermek için).
   var turdeVar = {}, turSay = {};
-  (V.sinavlar || []).forEach(function (s) { turdeVar[s.tur + '|' + s.id] = true; turSay[s.tur] = (turSay[s.tur] || 0) + 1; });
+  var turTarihleri = {};
+  (V.sinavlar || []).forEach(function (s) {
+    turdeVar[s.tur + '|' + s.id] = true; turSay[s.tur] = (turSay[s.tur] || 0) + 1;
+    (turTarihleri[s.tur + '|' + s.id] = turTarihleri[s.tur + '|' + s.id] || []).push(s.tarih);
+  });
+  // Bu türdeki bütün sınavları geçmişte kalan dersin sınav tarihleri (yoksa null).
+  function gecmisTarihler(t, id) {
+    var l = turTarihleri[t + '|' + id];
+    if (!l || !l.every(function (x) { return x < BUGUN; })) return null;
+    return l.slice().sort().filter(function (x, i, a) { return a.indexOf(x) === i; });
+  }
   var dersHarita = {};
   dersler.forEach(function (d) { dersHarita[d.id] = d; });
   var PROGRAM_YOK = !V.hata && !sinavlar.length;
@@ -1382,8 +1400,28 @@ window.ogrBaslat = function () {
           '<span class="sinavsiz-not">' + esc(notMetni(dersNotu(x.d, x.t), x.t)) + '</span></li>';
       }).join('') + '</ul></section>';
   }
+  // Sınavları geçmiş (ve geçmiş sınavlar gizliyken listede görünmeyen) seçili dersler.
+  function gecmisHtml() {
+    if (PERSONEL || PROGRAM_YOK || V.hata || durum.gecmis) return '';
+    var sec = aktifSecim(), t = T(), l = [];
+    if (!sec.size) return '';
+    dersler.forEach(function (d) {
+      if (!sec.has(d.id)) return;
+      notTurleri().forEach(function (tur) { var g = gecmisTarihler(tur, d.id); if (g) l.push({ d: d, t: tur, g: g }); });
+    });
+    if (!l.length) return '';
+    l.sort(function (a, b) { return a.d.kod.localeCompare(b.d.kod, 'tr') || a.t.localeCompare(b.t); });
+    return '<section class="sinavsiz" aria-labelledby="gectiBaslik"><h2 id="gectiBaslik">' + esc(t.gectiBaslik) + '</h2><ul>' +
+      l.map(function (x) {
+        return '<li><span class="s-kod mono">' + esc(x.d.kod) + '</span><span class="s-ad">' + esc(x.d.ad || t.adYok) + '</span>' +
+          (MOD ? '' : '<span class="etiket t-' + (TUR_SINIF[x.t] || 'diger') + '">' + esc(turAdi(x.t)) + '</span>') +
+          '<span class="sinavsiz-not">' + esc(t.gectiMetin(turAdi(x.t), x.g.map(tarihUzun).join(', '), x.g.length)) + '</span></li>';
+      }).join('') + '</ul><p class="sinavsiz-dugme"><button type="button" class="dugme" data-eylem="gecmis-goster">' + esc(t.gectiGoster) + '</button></p></section>';
+  }
   function seciciNotu(d) {
-    if (!MOD || PERSONEL || PROGRAM_YOK || turdeVar[MOD + '|' + d.id]) return '';
+    if (!MOD || PERSONEL || PROGRAM_YOK) return '';
+    if (gecmisTarihler(MOD, d.id)) return ' <span class="secici-not">' + esc(T().kisaNot.gecti) + '</span>';
+    if (turdeVar[MOD + '|' + d.id]) return '';
     var n = dersNotu(d, MOD), k = T().kisaNot;
     return ' <span class="secici-not">' + esc(k[n || 'bilinmiyor'] || k.serbest) + '</span>';
   }
@@ -1421,7 +1459,7 @@ window.ogrBaslat = function () {
       return;
     }
     var liste = gorunenSinavlar(false);
-    var sinavsiz = sinavsizHtml();
+    var sinavsiz = sinavsizHtml() + gecmisHtml();
     if (!liste.length) {
       k.innerHTML = gorunenSinavlar(true).length ? bosDurum(t.hepsiGecti, t.hepsiGectiMetin) + sinavsiz
         : PERSONEL && durum.gozetmen ? bosDurum(t.pGorevYok, t.pGorevYokMetin)
@@ -1756,6 +1794,7 @@ window.ogrBaslat = function () {
     }
     switch (t.getAttribute('data-eylem')) {
       case 'secici-ac': seciciAc(); break;
+      case 'gecmis-goster': durum.gecmis = true; cizArac(); cizListe(); break;
       case 'secici-kapat': seciciKapat(); break;
       case 'secimi-temizle': secimiDegistir(function (s) { s.clear(); }); break;
       case 'ics': icsSor(); break;
