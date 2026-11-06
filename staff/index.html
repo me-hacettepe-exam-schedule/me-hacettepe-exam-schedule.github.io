@@ -113,6 +113,19 @@ a { color: inherit; }
 .dil button[aria-pressed="true"] { background: var(--murekkep); color: var(--yaprak); }
 .sir-ne .etiket { vertical-align: 2px; margin-left: 4px; }
 @media (max-width: 639px) { #yazdirDugme, .takvimler > span { display: none; } }
+/* Telefon ve tablet: logo ve düğmeler üst satırda; kurum adı ve başlık tam genişlikte (dikey kurumsal imza). */
+@media (max-width: 999px) {
+  .antet-ad {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px;
+    grid-template-areas: "logo araclar" "metin metin" "baslik baslik" "alt alt";
+  }
+  .antet-ad > div:first-child, .antet-ad p.kurum { display: contents; }
+  .kurum-logo { grid-area: logo; align-self: center; width: 28px; height: 41px; }
+  .antet-araclar { grid-area: araclar; }
+  .kurum-metin { grid-area: metin; margin: 10px 0 8px; }
+  .antet-ad #baslik { grid-area: baslik; }
+  .antet-ad #altBaslik { grid-area: alt; }
+}
 .antet-araclar .kucuk-dugme span { display: none; }
 .antet-araclar .kucuk-dugme { width: 38px; justify-content: center; padding: 6px; }
 html[data-mod="vize"] .antet { border-top: 7px solid var(--vize); }
