@@ -99,6 +99,7 @@ a { color: inherit; }
   letter-spacing: -0.005em;
 }
 .antet-ad p { margin: 4px 0 0; color: var(--ikincil); font-size: .875rem; line-height: 1.35; }
+.antet-ad p.kurum { margin: 0 0 7px; font: 600 .75rem/1.2 var(--f-govde); letter-spacing: .09em; text-transform: uppercase; color: var(--murekkep); }
 .antet-ad { align-items: flex-start; }
 .antet-araclar { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
 .dil { display: inline-grid; grid-template-columns: 1fr 1fr; border: 1.5px solid var(--cizgi); border-radius: 6px; overflow: hidden; }
@@ -528,6 +529,7 @@ body.kilit { overflow: hidden; }
   <header class="antet">
     <div class="antet-ad">
       <div>
+        <p class="kurum" data-m="kurum">Hacettepe University</p>
         <h1 id="baslik">Exam Schedule</h1>
         <p id="altBaslik">Department of Mechanical Engineering</p>
       </div>
@@ -739,7 +741,7 @@ window.ogrBaslat = function () {
       program: { '': 'The exam schedule', 'Vize': 'The midterm exam schedule', 'Final': 'The final exam schedule', 'Bütünleme': 'The resit exam schedule' },
       siradaki: { '': 'Next exam', 'Vize': 'Next midterm exam', 'Final': 'Next final exam', 'Bütünleme': 'Next resit exam' },
       dosya: { '': 'exam-schedule', 'Vize': 'midterm-exam-schedule', 'Final': 'final-exam-schedule', 'Bütünleme': 'resit-exam-schedule' },
-      alt: 'Department of Mechanical Engineering',
+      alt: 'Department of Mechanical Engineering', kurum: 'Hacettepe University',
       donem: 'Term', guncel: 'Last updated', seciliDers: 'Selected courses', belirtilmemis: 'Not specified',
       dilAria: 'Language',
       temaKoyu: 'Dark theme', temaAcik: 'Light theme', temaKoyuAria: 'Switch to dark theme', temaAcikAria: 'Switch to light theme',
@@ -847,7 +849,7 @@ window.ogrBaslat = function () {
       program: { '': 'Sınav programı', 'Vize': 'Vize sınav programı', 'Final': 'Final sınav programı', 'Bütünleme': 'Bütünleme sınav programı' },
       siradaki: { '': 'Sıradaki sınav', 'Vize': 'Sıradaki vize sınavı', 'Final': 'Sıradaki final sınavı', 'Bütünleme': 'Sıradaki bütünleme sınavı' },
       dosya: { '': 'sinav-programi', 'Vize': 'vize-sinav-programi', 'Final': 'final-sinav-programi', 'Bütünleme': 'butunleme-sinav-programi' },
-      alt: 'Makine Mühendisliği Bölümü',
+      alt: 'Makina Mühendisliği Bölümü', kurum: 'Hacettepe Üniversitesi',
       donem: 'Dönem', guncel: 'Son güncelleme', seciliDers: 'Seçili ders', belirtilmemis: 'Belirtilmemiş',
       dilAria: 'Dil',
       temaKoyu: 'Koyu tema', temaAcik: 'Açık tema', temaKoyuAria: 'Koyu temaya geç', temaAcikAria: 'Açık temaya geç',
@@ -902,7 +904,7 @@ window.ogrBaslat = function () {
       tabloCaption: function (b) { return b + ': haftalara ve günlere göre sınavlar'; }, tabloHafta: 'Hafta',
       kaydirNot: ' Hafta sonu sütunlarını görmek için tabloyu yana kaydırınız.',
       tabloNot: 'Ayrıntılar ve takvime ekleme seçenekleri için bir sınav seçiniz.', tabloNotVurgu: ' Vurgulu kodlar seçili dersleri gösterir.',
-      pBaslik: 'Gözetmen Programı', pAlt: 'Makine Mühendisliği Bölümü, yalnızca personel için',
+      pBaslik: 'Gözetmen Programı', pAlt: 'Makina Mühendisliği Bölümü, yalnızca personel için',
       pFiltreDers: 'Seçili derslerin sınavları gösteriliyor: ', pFiltreHepsi: 'Tüm sınavlar gösteriliyor. Yalnızca kendi dersleriniz için “Dersler” düğmesini, bir gözetmenin görevleri için listeden adı seçiniz.',
       pGozetmen: 'Gözetmen', pHepsi: 'Tüm gözetmenler', pSiradaki: 'Sıradaki gözetmenlik görevi', pSiradakiHepsi: 'Sıradaki sınav',
       pGozetmenler: 'Gözetmenler', pGozetmenYok: 'Gözetmen atanmamış', pYayinlanmadi: 'Öğrencilere henüz yayımlanmayanlar: ',
@@ -1276,7 +1278,7 @@ window.ogrBaslat = function () {
   function metinleriUygula() {
     var t = T();
     document.documentElement.lang = DIL;
-    document.title = baslik();
+    document.title = baslik() + ' · ' + t.kurum;
     document.querySelectorAll('[data-m]').forEach(function (el) { var k = el.getAttribute('data-m'); if (typeof t[k] === 'string') el.textContent = t[k]; });
     document.querySelectorAll('[data-m-aria]').forEach(function (el) { el.setAttribute('aria-label', t[el.getAttribute('data-m-aria')]); });
     document.querySelectorAll('[data-m-ph]').forEach(function (el) { el.setAttribute('placeholder', t[el.getAttribute('data-m-ph')]); });
